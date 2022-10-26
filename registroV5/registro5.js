@@ -1,4 +1,5 @@
 window.onload = iniciar;
+
 //Esto es un array bidimensional
 const provincias = [
 	["Selecciona una comunidad autónoma"],
@@ -23,7 +24,32 @@ const provincias = [
 	["Melilla"]
 ]
 function iniciar(){
-	
+	/*
+	Para dragear el elemento
+*/
+// select the item element
+const item = document.querySelectorAll('.item');
+
+// attach the dragstart event handler
+for (let i=0 ;i<item.length;i++)
+{
+	item[i].addEventListener('dragstart', dragStart);
+}
+
+/*
+	Para soltar el elemento
+*/
+const boxes = document.querySelectorAll('.bordes');
+
+boxes.forEach(bordes => {
+    bordes.addEventListener('dragenter', dragEnter)
+    bordes.addEventListener('dragover', dragOver);
+    bordes.addEventListener('dragleave', dragLeave);
+    bordes.addEventListener('drop', drop);
+});
+
+
+
 	let imagenxd = document.getElementsByTagName('img')[0];
 		imagenxd.addEventListener('click',pulsar);
 	
@@ -41,12 +67,21 @@ function iniciar(){
 
 	document.getElementsByTagName('select')[1].style.display = "none";
 	document.getElementById("formulario").style.visibility = "hidden";
-	document.getElementsByTagName('img')[1].style.display = "none";
+	document.getElementsByTagName('img')[5].style.display = "none";
 	
-	let imagen2xd = document.getElementsByTagName('img')[1];
+	let imagen2xd = document.getElementsByTagName('img')[5];
 		imagen2xd.addEventListener('mouseover', cambiarFoto)
 		imagen2xd.addEventListener('mouseout', cambiarFoto2)
 		
+	}
+	function contarcosa(){
+		const transaction= db.transaction('registro','readonly');
+		const objetoStore=transaction.objectStore('registro');
+		const contador=objetoStore.count();
+		console.log("HOLAAAAAAAAAAAA22222222222222",contador);
+		contador.onsuccess=function(){
+			window.alert('Usuarios registrados: '+contador.result)
+		};
 	}
 function pulsar()
 	{
@@ -89,11 +124,11 @@ function validarFecha(){
 	console.log(fechaActual-fechaNacimiento)
 	if (fechaActual-fechaNacimiento < 315603596089)
 	{
-		document.getElementsByTagName('img')[1].style.display = "inline";
+		document.getElementsByTagName('img')[5].style.display = "inline";
 	}
 	else
 	{
-		document.getElementsByTagName('img')[1].style.display = "none";
+		document.getElementsByTagName('img')[5].style.display = "none";
 	}
 }
 function cambiarFoto()
@@ -108,6 +143,41 @@ function cambiarFoto2()
 }
 
 
-	
-	
+// handle the dragstart
 
+function dragStart(e) {
+   console.log('drag starts...');
+     e.dataTransfer.setData('text/plain', e.target.id);
+    setTimeout(() => {
+        e.target.classList.add('hide');
+    }, 0);
+}
+
+
+function dragEnter(e) {
+    e.preventDefault();
+    e.target.classList.add('drag-over');
+}
+
+function dragOver(e) {
+    e.preventDefault();
+    e.target.classList.add('drag-over');
+}
+
+function dragLeave(e) {
+    e.target.classList.remove('drag-over');
+}
+
+function drop(e) {
+    e.target.classList.remove('drag-over');
+
+    // get the draggable element
+    const id = e.dataTransfer.getData('text/plain');
+    const draggable = document.getElementById(id);
+
+    // add it to the drop target
+    e.target.appendChild(draggable);
+
+    // display the draggable element
+    draggable.classList.remove('hide');
+}
