@@ -1,7 +1,7 @@
 window.onload = iniciar;
 
-//Esto es un array bidimensional
-const provincias = [
+//Esto es un array bidimensional de las provincias de cada comunidad
+const PROVINCIAS = [
 	["Selecciona una comunidad autónoma"],
 	["Almería", "Cádiz", "Córdoba", "Granada", "Huelva", "Jaén", "Málaga", "Sevilla"],
 	["Huesca", "Teruel", "Zaragoza"],
@@ -23,74 +23,63 @@ const provincias = [
 	["Ceuta"],
 	["Melilla"]
 ]
+/**
+ * Configuracion inicial de la pagina
+ */
 function iniciar(){
-	//Buscamos el formulario del html
+	
 	const formulario=document.getElementById('formulario');
-	//IndexedDB desciende de la clase Window, si no lo instanciamos así dará error si la variable tiene el mismo nombre
-	//USAR SIEMPRE WINDOW, evitamos posibles errores
+	
 	const baseDatos=window.indexedDB
 	
-	
-	
-	//Preguntamos si ya existe esta base de datos
 	if(baseDatos){
-		//Variable que en caso de existencia trabajará la base de datos
-		const respuesta=indexedDB.open("registro",1);//Metodo que permite acceder a la base de datos, va a recibir dos parametros, nombre y versión(siempre numeros enteros),
-		//Metodo para el caso en el que la respuesta sea OK
+		
+		const respuesta=indexedDB.open("registro",1);
 		respuesta.onsuccess=()=>{
 			
 			db=respuesta.result
-			console.log('ABIERTA',db);
-			contarcosa();
 		
-			
-		}
-		//Metodo para el caso en el la base de datos necesite actualización
-		//También la crea en caso de que no exista, es la primera que observa, una vez creada, la abre
-		//Tambien es aquí donde se va a usar el registro en la bbdd
+			contar();	
+		}	
 		respuesta.onupgradeneeded=()=>{
 			db=respuesta.result
-			console.log('CREADA',db);
-			//Creamos un objeto que sera nuestro almacén dentro de la bbdd
+		
+			
 			const objAlmacen=db.createObjectStore('registro',{
 				autoIncrement:true
-			});//NOMBRE DEL ALMACÉN
+			});
 		}
-		//Metodo para el caso en el que la base de datos de error
+		
 		respuesta.onerror=()=>{
 			db=respuesta.result
-			console.log('CREADA',db);
 		}
-		const anhadirDatos=(data)=>{
-			//Las bbdd indexadas funcionan con transacciones, por ello
+		const addDatos=(data)=>{
+		
+			const transaccion=db.transaction(['registro'],'readwrite');
 			
-			//Creamos un objeto tipo transacción en el que recibira el almacen creado
-			const transaccion=db.transaction(['registro'],'readwrite');//Almacen con el que trabajamos y modo de trabajo(leer y escribir)
-			//Abrimos con el metodo objectStore el almacen y lo asociamos a una variable
 			const almacen=transaccion.objectStore('registro');
 			const peticion=almacen.add(data);
 		}
-		//Evento para ver que todo fue correctamente al enviar
+	
 		formulario.addEventListener('submit',(e)=>{
 			e.preventDefault();
-			//Objeto que añadiremos a la bbdd
+		
 			const data={
 				email:e.target.email.value,
 				pswd:e.target.password.value
 			}
-			console.log(data);
 			
-			//Guardamos los datos despues de la funcion anhadirDatos();
-			anhadirDatos(data);
+			
+			addDatos(data);
 		})
 	}
-	/*
+/*
 	Para dragear el elemento
 */
-// select the item element
+// seleccionamos el elemento que tenga la clase item
 const item = document.querySelectorAll('.item');
 
-// attach the dragstart event handler
+// le añadimos a cada elemento(cogeremos varios ya que tenemos 4 imagenes asociadas) el evento dragstart que dara comienzo al drag
 for (let i=0 ;i<item.length;i++)
 {
 	item[i].addEventListener('dragstart', dragStart);
@@ -134,41 +123,51 @@ boxes.forEach(bordes => {
 		imagen2xd.addEventListener('mouseout', cambiarFoto2)
 		
 	}
-	function contarcosa(){
+	function contar(){
 		const transaction= db.transaction('registro','readonly');
 		const objetoStore=transaction.objectStore('registro');
 		const contador=objetoStore.count();
-		console.log("HOLAAAAAAAAAAAA22222222222222",contador);
 		contador.onsuccess=function(){
 			window.alert('Usuarios registrados: '+contador.result)
 		};
 	}
+/**
+ * Funcion pulsar para que al hacer click en la imagen sea visible el formulario
+ */
 function pulsar()
 	{
 		document.getElementById("formulario").style.visibility = "visible";
 	}
+/**
+ * Funcion aceptar para que al hacer click en el boton aceptar sea invisible el formulario de nuevo y te mande una alerta de que el usuario se ha registrado
+ */
 function aceptar()
 	{
 		document.getElementById("formulario").style.visibility = "hidden";
 		alert("El usuario ha sido registrado");
 	}
-		
+/**
+ * Funcion cancelar para borrar los campos de email y nombre
+ */		
 function cancelar()
 	{
 		document.getElementsByTagName('input')[0].value="";
 		document.getElementsByTagName('input')[1].value="";
 	}
+/**
+ * Funcion seleccionar que al cambiar el valor del select se genera un segundo select con la seleccion previamente realizada
+ */
 function seleccionar()
 {	//Con esto estoy sacando el valor que nos introduce el usuario
 	let seleccion = document.getElementsByTagName('select')[0][document.getElementsByTagName('select')[0].selectedIndex].value
 	console.log(seleccion)
-	let num_provincias= provincias[seleccion].length;
+	let num_provincias= PROVINCIAS[seleccion].length;
 	console.log(num_provincias)
 	document.getElementsByTagName('select')[1].length = num_provincias;
 
 	for (let i=0;i<num_provincias;i++)
 	{
-		document.getElementsByTagName('select')[1][i].text=provincias[seleccion][i];
+		document.getElementsByTagName('select')[1][i].text=PROVINCIAS[seleccion][i];
 	}
 	
 	document.getElementsByTagName('select')[1].style.display = "inline";
@@ -203,7 +202,6 @@ function cambiarFoto2()
 }
 
 
-// handle the dragstart
 
 function dragStart(e) {
    console.log('drag starts...');
@@ -231,13 +229,13 @@ function dragLeave(e) {
 function drop(e) {
     e.target.classList.remove('drag-over');
 
-    // get the draggable element
+   
     const id = e.dataTransfer.getData('text/plain');
     const draggable = document.getElementById(id);
 
-    // add it to the drop target
+    
     e.target.appendChild(draggable);
 
-    // display the draggable element
+   
     draggable.classList.remove('hide');
 }

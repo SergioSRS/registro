@@ -1,7 +1,7 @@
 window.onload = iniciar;
 
-//Esto es un array bidimensional
-const provincias = [
+//Esto es un array bidimensional de las provincias de cada comunidad
+const PROVINCIAS = [
 	["Selecciona una comunidad autónoma"],
 	["Almería", "Cádiz", "Córdoba", "Granada", "Huelva", "Jaén", "Málaga", "Sevilla"],
 	["Huesca", "Teruel", "Zaragoza"],
@@ -23,22 +23,23 @@ const provincias = [
 	["Ceuta"],
 	["Melilla"]
 ]
+/**
+ * Configuracion inicial de la pagina
+ */
 function iniciar(){
-	/*
+/*
 	Para dragear el elemento
 */
-// select the item element
+// seleccionamos el elemento que tenga la clase item
 const item = document.querySelectorAll('.item');
 
-// attach the dragstart event handler
+// le añadimos a cada elemento(cogeremos varios ya que tenemos 4 imagenes asociadas) el evento dragstart que dara comienzo al drag
 for (let i=0 ;i<item.length;i++)
 {
 	item[i].addEventListener('dragstart', dragStart);
 }
 
-/*
-	Para soltar el elemento
-*/
+//Para soltar el elemento
 const boxes = document.querySelectorAll('.bordes');
 
 boxes.forEach(bordes => {
@@ -47,8 +48,6 @@ boxes.forEach(bordes => {
     bordes.addEventListener('dragleave', dragLeave);
     bordes.addEventListener('drop', drop);
 });
-
-
 
 	let imagenxd = document.getElementsByTagName('img')[0];
 		imagenxd.addEventListener('click',pulsar);
@@ -74,54 +73,57 @@ boxes.forEach(bordes => {
 		imagen2xd.addEventListener('mouseout', cambiarFoto2)
 		
 	}
-	function contarcosa(){
-		const transaction= db.transaction('registro','readonly');
-		const objetoStore=transaction.objectStore('registro');
-		const contador=objetoStore.count();
-		console.log("HOLAAAAAAAAAAAA22222222222222",contador);
-		contador.onsuccess=function(){
-			window.alert('Usuarios registrados: '+contador.result)
-		};
-	}
+/**
+ * Funcion pulsar para que al hacer click en la imagen sea visible el formulario
+ */
 function pulsar()
 	{
 		document.getElementById("formulario").style.visibility = "visible";
 	}
+/**
+ * Funcion aceptar para que al hacer click en el boton aceptar sea invisible el formulario de nuevo y te mande una alerta de que el usuario se ha registrado
+ */
 function aceptar()
 	{
 		document.getElementById("formulario").style.visibility = "hidden";
 		alert("El usuario ha sido registrado");
 	}
-		
+/**
+ * Funcion cancelar para borrar los campos de email y nombre
+ */			
 function cancelar()
 	{
 		document.getElementsByTagName('input')[0].value="";
 		document.getElementsByTagName('input')[1].value="";
 	}
+/**
+ * Funcion seleccionar que al cambiar el valor del select se genera un segundo select con la seleccion previamente realizada
+ */
 function seleccionar()
 {	//Con esto estoy sacando el valor que nos introduce el usuario
 	let seleccion = document.getElementsByTagName('select')[0][document.getElementsByTagName('select')[0].selectedIndex].value
-	console.log(seleccion)
-	let num_provincias= provincias[seleccion].length;
-	console.log(num_provincias)
+	
+	let num_provincias= PROVINCIAS[seleccion].length;
+	
 	document.getElementsByTagName('select')[1].length = num_provincias;
 
 	for (let i=0;i<num_provincias;i++)
 	{
-		document.getElementsByTagName('select')[1][i].text=provincias[seleccion][i];
+		document.getElementsByTagName('select')[1][i].text=PROVINCIAS[seleccion][i];
 	}
 	
 	document.getElementsByTagName('select')[1].style.display = "inline";
 }
+/**
+ * Funcion para verificar que el usuario tenga mas de 10 años, si no los tiene aparecera una imagen de perry el ornitorrinco
+ */
 function validarFecha(){
 	let fecha= document.getElementsByTagName('input')[2].value
 
 	let fechaNacimiento = new Date(fecha)
 	
 	let fechaActual = new Date()
-	console.log(fechaNacimiento)
-	console.log(fechaActual)
-	console.log(fechaActual-fechaNacimiento)
+//315603596089 ms = 10 años
 	if (fechaActual-fechaNacimiento < 315603596089)
 	{
 		document.getElementsByTagName('img')[5].style.display = "inline";
@@ -131,11 +133,17 @@ function validarFecha(){
 		document.getElementsByTagName('img')[5].style.display = "none";
 	}
 }
+/**
+ * Funcion para que al pasar el raton por la imagen de perry se cambie la del doctor a otra de phineas y fer
+ */
 function cambiarFoto()
 {
 	let phineasyfer = "imagenes/fineasfer.jpg"
 	document.getElementsByTagName('img')[0].setAttribute('src',phineasyfer);
 }
+/**
+ * Funcion para que al dejar de situarse encima de la foto de perry vuelva la foto del doctor
+ */
 function cambiarFoto2()
 {
 	let doctor = "imagenes/imgen.webp"
@@ -143,16 +151,15 @@ function cambiarFoto2()
 }
 
 
-// handle the dragstart
+// administra el dragstart
 
 function dragStart(e) {
-   console.log('drag starts...');
+  
      e.dataTransfer.setData('text/plain', e.target.id);
     setTimeout(() => {
         e.target.classList.add('hide');
     }, 0);
 }
-
 
 function dragEnter(e) {
     e.preventDefault();
@@ -171,13 +178,13 @@ function dragLeave(e) {
 function drop(e) {
     e.target.classList.remove('drag-over');
 
-    // get the draggable element
+
     const id = e.dataTransfer.getData('text/plain');
     const draggable = document.getElementById(id);
 
-    // add it to the drop target
+
     e.target.appendChild(draggable);
 
-    // display the draggable element
+    
     draggable.classList.remove('hide');
 }

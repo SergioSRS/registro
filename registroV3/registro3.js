@@ -1,6 +1,6 @@
 window.onload = iniciar;
-//Esto es un array bidimensional
-const provincias = [
+//Esto es un array bidimensional de las provincias de cada comunidad
+const PROVINCIAS = [
 	["Selecciona una comunidad autónoma"],
 	["Almería", "Cádiz", "Córdoba", "Granada", "Huelva", "Jaén", "Málaga", "Sevilla"],
 	["Huesca", "Teruel", "Zaragoza"],
@@ -22,6 +22,9 @@ const provincias = [
 	["Ceuta"],
 	["Melilla"]
 ]
+/**
+ * Configuracion inicial de la pagina
+ */
 function iniciar(){
 	
 	let imagenxd = document.getElementsByTagName('img')[0];
@@ -44,45 +47,58 @@ function iniciar(){
 	document.getElementsByTagName('img')[1].style.display = "none";
 		
 	}
+/**
+ * Funcion pulsar para que al hacer click en la imagen sea visible el formulario
+ */
 function pulsar()
 	{
 		document.getElementById("formulario").style.visibility = "visible";
 	}
+/**
+ * Funcion aceptar para que al hacer click en el boton aceptar sea invisible el formulario de nuevo y te mande una alerta de que el usuario se ha registrado
+ */
 function aceptar()
 	{
 		document.getElementById("formulario").style.visibility = "hidden";
 		alert("El usuario ha sido registrado");
 	}
-		
+/**
+ * Funcion cancelar para borrar los campos de email y nombre
+ */
 function cancelar()
 	{
 		document.getElementsByTagName('input')[0].value="";
 		document.getElementsByTagName('input')[1].value="";
 	}
+/**
+ * Funcion seleccionar que al cambiar el valor del select se genera un segundo select con la seleccion previamente realizada
+ */
 function seleccionar()
 {	//Con esto estoy sacando el valor que nos introduce el usuario
 	let seleccion = document.getElementsByTagName('select')[0][document.getElementsByTagName('select')[0].selectedIndex].value
-	console.log(seleccion)
-	let num_provincias= provincias[seleccion].length;
-	console.log(num_provincias)
+	
+	let num_provincias= PROVINCIAS[seleccion].length;
+	
 	document.getElementsByTagName('select')[1].length = num_provincias;
 
 	for (let i=0;i<num_provincias;i++)
 	{
-		document.getElementsByTagName('select')[1][i].text=provincias[seleccion][i];
+		document.getElementsByTagName('select')[1][i].text=PROVINCIAS[seleccion][i];
 	}
 	
 	document.getElementsByTagName('select')[1].style.display = "inline";
 }
+/**
+ * Funcion para verificar que el usuario tenga mas de 10 años, si no los tiene aparecera una imagen de perry el ornitorrinco
+ */
 function validarFecha(){
 	let fecha= document.getElementsByTagName('input')[2].value
 
 	let fechaNacimiento = new Date(fecha)
 	
 	let fechaActual = new Date()
-	console.log(fechaNacimiento)
-	console.log(fechaActual)
-	console.log(fechaActual-fechaNacimiento)
+
+	//315603596089 ms =10 años
 	if (fechaActual-fechaNacimiento < 315603596089)
 	{
 		document.getElementsByTagName('img')[1].style.display = "inline";
